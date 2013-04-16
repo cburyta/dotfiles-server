@@ -1,0 +1,70 @@
+[push]
+  default = tracking
+[branch]
+  autosetuprebase = always
+[color]
+  branch = auto
+  diff = auto
+  interactive = auto
+  status = auto
+[core]
+  excludesfile = ~/.gitignore
+  editor = vim
+  autocrlf = input
+[format]
+  pretty = oneline
+  pretty = %Cblue%h%Creset %Cgreen[%ar]%Creset (%an) %s
+#[diff]
+#  external = default-git-tool.sh
+[pager]
+  diff =
+[alias]
+  # usage: git amend
+  # if you forgot to commit a file or something in a commit, use git amend
+  # alias in place of git commit to just add that commit into the previous commit
+  amend = commit --amend -C HEAD
+
+
+  # usage: git accept 23       - will create branch ticket-23, branching off devel
+  #        git accept 23 stage - will create branch ticket-23, branching off stage
+  accept  = "!f() { if [ -z $2 ] ; then BRANCH_MAIN='devel' ; else BRANCH_MAIN=$2 ; fi ; BRANCH_FEATURE=\"ticket-$1\" ; git checkout -b $BRANCH_FEATURE $BRANCH_MAIN ; }; f"
+
+  # usage: git resolve 23       - will delete branch ticket-23, merging it into devel
+  #        git resolve 23 stage - will delete branch ticket-23, merging it into stage
+  # this method rebases the main branch before a merge
+  # resolve = "!f() { if [ -z $2 ] ; then BRANCH_MAIN='devel' ; else BRANCH_MAIN=$2 ; fi ; BRANCH_FEATURE=\"ticket-$1\" ; git checkout $BRANCH_MAIN ; git pull --rebase ; git checkout $BRANCH_FEATURE ; git rebase $BRANCH_MAIN ; git checkout $BRANCH_MAIN ; git merge --ff-only $BRANCH_FEATURE ; git branch -d $BRANCH_FEATURE ; }; f"
+  # this method leaves the rebase of master to the up aliases, and only focuses on rebasing the main branch into the feature branch before a merge
+  resolve = "!f() { if [ -z $2 ] ; then BRANCH_MAIN='devel' ; else BRANCH_MAIN=$2 ; fi ; BRANCH_FEATURE=\"ticket-$1\" ; git checkout $BRANCH_MAIN ; git pull --rebase ; git checkout $BRANCH_FEATURE ; git rebase $BRANCH_MAIN --preserve-merges ; git checkout $BRANCH_MAIN ; git merge --ff-only $BRANCH_FEATURE ; git branch -d $BRANCH_FEATURE ; }; f"
+
+  # pulls from remote (origin) to merge into local branch
+  # ONLY use with long-living branches that are shared on remote (devel, stage, master), since feature branches don't live in remote
+  # usage: git up - will fetch origin/devel and rebase into local devel branch
+  #        git up stage - will fetch origin/stage and rebase into local stage branch
+  #        git upd - alias for git up devel
+  #        git upm - alias for git up master
+  up  = "!f() { if [ -z $1 ] ; then BRANCH_MAIN='devel' ; else BRANCH_MAIN=$1 ; fi ; git checkout $BRANCH_MAIN ; echo "Fetching origin/$BRANCH_MAIN" ; git remote update ; echo "Rebasing origin/$BRANCH_MAIN" ;  git rebase origin/$BRANCH_MAIN --preserve-merges ; }; f"
+  upd = "!git up devel"
+  upm = "!git up master"
+
+  ahot = "!f() { git checkout -b hotfix-$1 master; }; f"
+  rhot = "!f() { git checkout master; git pull; git checkout hotfix-$1; git rebase master; git checkout master; git merge --no-ff hotfix-$1; git branch -d hotfix-$1; }; f"
+
+  c = commit -m
+  a = !git add -u && git add . && git status -s
+  di = diff
+  dic = diff --cached
+  pl = pull
+  ps = push
+  plre = pull --rebase
+  st = status --short
+  graph = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  ci = commit
+  ca = commit --amend
+  pr = remote prune origin
+  # up = !git fetch origin && git rebase origin/master
+  rbc = rebase --continue
+  rbi = rebase -i
+  mm = !test `git rev-parse master` = $(git merge-base HEAD master) && git checkout master && git merge HEAD@{1} || echo "Non-fastforward"
+  ap = commit --amend -C HEAD
+  co = checkout
+  adi = !git add -u && git add . && git diff --cached
