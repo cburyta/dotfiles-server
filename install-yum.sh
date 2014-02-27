@@ -13,5 +13,5 @@ fi
 
 if [ ! test -f ~/.vimrc ]
     then
-        wget https://raw.github.com/cburyta/dotfiles-server/master/gitconfig -O ~/.vimrc
+        wget https://raw.github.com/cburyta/dotfiles-server/master/vimrc -O ~/.vimrc
 fi
