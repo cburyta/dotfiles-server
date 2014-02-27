@@ -6,12 +6,12 @@
 
 yum install wget vim -y
 
-if [ ! test -f ~/.gitconfig ]
+if [ ! -f ~/.gitconfig ]
     then
         wget https://raw.github.com/cburyta/dotfiles-server/master/gitconfig -O ~/.gitconfig
 fi
 
-if [ ! test -f ~/.vimrc ]
+if [ ! -f ~/.vimrc ]
     then
         wget https://raw.github.com/cburyta/dotfiles-server/master/vimrc -O ~/.vimrc
 fi
